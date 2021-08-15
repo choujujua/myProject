@@ -32,7 +32,7 @@ def rle_decode(mask_rle, shape=(512, 512)):
     return img.reshape(shape, order='F')
 
 if __name__ == '__main__':
-    train_mask = pd.read_csv('train_mask.csv', sep='\t', names=['name', 'mask'])
+    train_mask = pd.read_csv('G:/myproject/train_mask.csv', sep='\t', names=['name', 'mask'])
 
     # 读取第一张图，并将对于的rle解码为mask矩阵
     img = cv2.imread('train/' + train_mask['name'].iloc[0])
