@@ -16,7 +16,7 @@ import torch.utils.data as D
 trfm = T.Compose([
     ToTensor()
 ])
-
+print('111')
 
 train_mask = pd.read_csv('G:/myProject/train_mask.csv', sep='\t', names=['name','mask'])
 dataset = TianChiDataset(
