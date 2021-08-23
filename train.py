@@ -1,16 +1,12 @@
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
-import torch.utils.data as D
-
-import torchvision
 from torchvision import transforms as T
 from model import get_model
-from loss import get_loss
 import pandas as pd
 from data_reader import TianChiDataset
 from utils import ToTensor
 import torch.utils.data as D
+import numpy as np
 
 # loader data set
 trfm = T.Compose([
@@ -37,6 +33,7 @@ train_set = D.Subset(dataset, train_idx)
 valid_set = D.Subset(dataset, valid_idx)
 
 train_loader = D.DataLoader(train_set, batch_size=4, shuffle=True, num_workers=0)
+valid_loader = D.DataLoader(valid_set, batch_size=4, shuffle=True, num_workers=2)
 
 Epochs = 1
 batch_size = 32
@@ -53,35 +50,51 @@ def loss_fcn(pred, target):
 model = get_model()
 # loss = get_loss()
 
-optimiter = torch.optim.AdamW(model.parameters(), lr=1e-4, weight_decay=1e-3)
-
-def evalidate(model, dataset):
-
-    # losses = []
+optimizer = torch.optim.AdamW(model.parameters(), lr=1e-4, weight_decay=1e-3)
 
 
+# 验证数据集
+def evalidate(model, valid_loader, loss_fn):
 
-    return loss
+    losses = []
 
+    model.eval()
+    for i, (img, target) in enumerate(valid_loader):
+        output = model(img)
+        loss = loss_fcn(target, output)
+        losses.append(loss.item())
+
+    return np.array(losses).mean()
+
+
+
+
+    return 0
+
+
+# 训练数据集
 for epoch in range(0, Epochs):
 
     losses = []
     for i, (img, target) in enumerate(train_loader):
-        print('img.shape = ', img.shape)
+        optimizer.zero_grad()
+        # print('img.shape = ', img.shape)
         target = target.long()
         output = model(img)
-        print('output.shape = ', output.shape)
-        print('target.shape = ', target.shape)
-        print('target = ', target)
         loss = loss_fcn(output, target)
+        print('loss = ', loss)
         loss.backward()
-        optimiter.step()
+        optimizer.step()
         losses.append(loss.item())
+    print('losses = ', np.array(losses).mean())
 
     # validate for two epoch
 
     if epoch % 2 == 0:
         eval_loss = evalidate(model, valid_set)
+
+    # save model
+
 
     # print information when validating
 
